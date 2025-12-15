@@ -29,7 +29,9 @@ interface Product {
     price: number;
 }
 
-export default function DiscountsPage() {
+import { Suspense } from "react";
+
+function DiscountsContent() {
     const router = useRouter();
     const [discounts, setDiscounts] = useState<Discount[]>([]);
     const [products, setProducts] = useState<Product[]>([]);
@@ -159,5 +161,15 @@ export default function DiscountsPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function DiscountsPage() {
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>}>
+            <DiscountsContent />
+        </Suspense>
     );
 }
