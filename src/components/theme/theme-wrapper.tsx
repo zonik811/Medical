@@ -5,8 +5,8 @@ import { useThemeStore } from "@/lib/store/theme-store";
 import { api } from "@/services/api";
 import { useSearchParams } from "next/navigation";
 
-function ThemeController({ children }: { children: React.ReactNode }) {
-    const { theme, setTheme, loadTheme } = useThemeStore();
+function ThemeController() {
+    const { theme, loadTheme } = useThemeStore();
     const searchParams = useSearchParams();
     const isPreviewMode = searchParams.get("preview") === "true";
 
@@ -80,15 +80,16 @@ function ThemeController({ children }: { children: React.ReactNode }) {
 
     }, [theme]);
 
-    return <>{children}</>;
+    return null;
 }
 
 export default function ThemeWrapper({ children }: { children: React.ReactNode }) {
     return (
-        <Suspense fallback={<>{children}</>}>
-            <ThemeController>
-                {children}
-            </ThemeController>
-        </Suspense>
+        <>
+            <Suspense fallback={null}>
+                <ThemeController />
+            </Suspense>
+            {children}
+        </>
     );
 }
