@@ -2,7 +2,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, ShoppingBag, Settings, Tag, Palette } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Settings, Palette } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,7 @@ export default function AdminNav() {
     const sidebarItems = [
         { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
         { icon: ShoppingBag, label: 'Productos', href: '/dashboard/products' },
-        { icon: Tag, label: 'Descuentos', href: '/dashboard/discounts' },
+
         { icon: Palette, label: 'Editor Visual', href: '/dashboard/theme-editor' },
         { icon: Settings, label: 'Configuración', href: '/dashboard/settings' },
     ];
