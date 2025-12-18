@@ -46,7 +46,7 @@ const DEFAULT_CONFIG: LandingConfig['config'] = {
     count: 6
   },
   brands: {
-    title: "Marcas que Confían en Nosotros",
+    title: "Nuestros Aliados",
     subtitle: ""
   },
   faq: {
@@ -536,7 +536,7 @@ export default function LandingPage() {
         }
         
         .animate-marquee {
-          animation: marquee 30s linear infinite;
+          animation: marquee 15s linear infinite;
         }
         
         .animate-marquee:hover {
