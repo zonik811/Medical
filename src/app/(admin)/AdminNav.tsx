@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, ShoppingBag, Settings, Palette, Tag, Award } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Settings, Palette, Tag, Award, FolderTree } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ export default function AdminNav() {
         { icon: ShoppingBag, label: 'Productos', href: '/dashboard/products' },
         { icon: Tag, label: 'Descuentos', href: '/dashboard/discounts' },
         { icon: Award, label: 'Marcas', href: '/dashboard/brands' },
+        { icon: FolderTree, label: 'Categorías', href: "/dashboard/categories" },
         { icon: Palette, label: 'Editor Visual', href: '/dashboard/theme-editor' },
         { icon: Settings, label: 'Configuración', href: '/dashboard/settings' },
     ];

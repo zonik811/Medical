@@ -297,12 +297,34 @@ export const api = {
                 [Query.equal('businessId', businessId)]
             );
         },
+        get: async (id: string) => {
+            return databases.getDocument(
+                appwriteConfig.databaseId,
+                appwriteConfig.collections.categories,
+                id
+            );
+        },
         create: async (data: any) => {
             return databases.createDocument(
                 appwriteConfig.databaseId,
                 appwriteConfig.collections.categories,
                 ID.unique(),
                 data
+            );
+        },
+        update: async (id: string, data: any) => {
+            return databases.updateDocument(
+                appwriteConfig.databaseId,
+                appwriteConfig.collections.categories,
+                id,
+                data
+            );
+        },
+        delete: async (id: string) => {
+            return databases.deleteDocument(
+                appwriteConfig.databaseId,
+                appwriteConfig.collections.categories,
+                id
             );
         }
     },
