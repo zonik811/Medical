@@ -26,7 +26,7 @@ export const appwriteConfig = {
     },
     buckets: {
         productImages: 'product-images',
-        brandLogos: 'brand-logos',
+        brandLogos: 'product-images',  // Reusing same bucket (free tier limit)
     }
 };
 
