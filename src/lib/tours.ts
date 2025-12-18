@@ -48,10 +48,28 @@ export const productsTour: DriveStep[] = [
         }
     },
     {
+        element: "[data-tour='manage-stock']",
+        popover: {
+            title: "📦 Gestionar Stock",
+            description: "Usa este botón morado para abrir el modal y cambiar el stock del producto. Puedes sumar o restar unidades fácilmente.",
+            side: "left",
+            align: "center"
+        }
+    },
+    {
+        element: "[data-tour='edit-product']",
+        popover: {
+            title: "✏️ Editar Producto",
+            description: "Usa este botón azul para modificar cualquier información del producto: precio, descripción, imágenes, categoría, etc.",
+            side: "left",
+            align: "center"
+        }
+    },
+    {
         element: "[data-tour='delete-product']",
         popover: {
             title: "🗑️ Eliminar Producto",
-            description: "Este botón elimina el producto permanentemente. Te pedirá confirmación antes de borrarlo.",
+            description: "Este botón rojo elimina el producto permanentemente. Te pedirá confirmación antes de borrarlo.",
             side: "left",
             align: "center"
         }

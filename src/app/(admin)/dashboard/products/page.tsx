@@ -162,6 +162,7 @@ export default function ProductsPage() {
                                                 setStockModalOpen(true);
                                             }}
                                             title="Gestionar Stock"
+                                            data-tour={index === 0 ? "manage-stock" : undefined}
                                         >
                                             <Package size={18} className="text-purple-500" />
                                         </Button>
