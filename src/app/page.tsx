@@ -524,7 +524,7 @@ export default function LandingPage() {
             <div className="overflow-hidden mt-8">
               <div className="relative">
                 <div className="flex gap-12 animate-marquee-reverse">
-                  {brands.map((brand) => (
+                  {brands.slice(7).map((brand) => (
                     <div
                       key={`${brand.$id}-row2`}
                       className="flex-shrink-0 flex items-center justify-center p-6 rounded-lg transition-all hover:scale-110 bg-card/50 backdrop-blur-sm border"
@@ -546,7 +546,7 @@ export default function LandingPage() {
                       )}
                     </div>
                   ))}
-                  {brands.map((brand) => (
+                  {brands.slice(7).map((brand) => (
                     <div
                       key={`${brand.$id}-row2-duplicate`}
                       className="flex-shrink-0 flex items-center justify-center p-6 rounded-lg transition-all hover:scale-110 bg-card/50 backdrop-blur-sm border"
