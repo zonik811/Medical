@@ -2,25 +2,36 @@
 
 import { ProductForm } from "@/components/admin/product-form";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { createProductTour, startTour } from "@/lib/tours";
 
 export default function CreateProductPage() {
     const router = useRouter();
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-4">
-                <Link href="/dashboard/products">
-                    <Button variant="ghost" size="icon">
-                        <ArrowLeft size={20} />
-                    </Button>
-                </Link>
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Nuevo Producto</h2>
-                    <p className="text-muted-foreground">Agrega un nuevo ítem a tu catálogo.</p>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <Link href="/dashboard/products">
+                        <Button variant="ghost" size="icon">
+                            <ArrowLeft size={20} />
+                        </Button>
+                    </Link>
+                    <div>
+                        <h2 className="text-2xl font-bold tracking-tight">Nuevo Producto</h2>
+                        <p className="text-muted-foreground">Agrega un nuevo ítem a tu catálogo.</p>
+                    </div>
                 </div>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => startTour(createProductTour)}
+                    title="Ver guía de creación"
+                >
+                    <HelpCircle className="h-5 w-5" />
+                </Button>
             </div>
 
             <ProductForm

@@ -15,7 +15,8 @@ import {
 import { useState, useEffect } from "react";
 import { Product, Category } from "@/types";
 import { api } from "@/services/api";
-import { Loader2, Upload, Plus } from "lucide-react";
+import { Loader2, Upload, Plus, HelpCircle } from "lucide-react";
+import { createProductTour, startTour } from "@/lib/tours";
 
 interface ProductFormProps {
     initialData?: Product;
@@ -111,7 +112,7 @@ export function ProductForm({ initialData, businessId, onSuccess }: ProductFormP
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6 max-w-xl bg-white dark:bg-slate-900 p-6 rounded-lg border shadow-sm">
-            <div className="space-y-2">
+            <div className="space-y-2" data-tour="product-name">
                 <Label htmlFor="name">Nombre del Producto</Label>
                 <Input
                     id="name"
@@ -122,7 +123,7 @@ export function ProductForm({ initialData, businessId, onSuccess }: ProductFormP
                 />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2" data-tour="product-description">
                 <Label htmlFor="description">Descripción</Label>
                 <Textarea
                     id="description"
@@ -133,7 +134,7 @@ export function ProductForm({ initialData, businessId, onSuccess }: ProductFormP
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-2" data-tour="product-price">
                     <Label htmlFor="price">Precio</Label>
                     <div className="relative">
                         <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
@@ -149,7 +150,7 @@ export function ProductForm({ initialData, businessId, onSuccess }: ProductFormP
                     </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2" data-tour="product-category">
                     <Label>Categoría</Label>
                     {isNewCategory ? (
                         <div className="flex gap-2">
@@ -188,6 +189,7 @@ export function ProductForm({ initialData, businessId, onSuccess }: ProductFormP
                                 size="icon"
                                 onClick={() => setIsNewCategory(true)}
                                 title="Crear nueva categoría"
+                                data-tour="category-create"
                             >
                                 <Plus className="h-4 w-4" />
                             </Button>
@@ -196,7 +198,7 @@ export function ProductForm({ initialData, businessId, onSuccess }: ProductFormP
                 </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2" data-tour="product-image">
                 <Label>Imagen del Producto</Label>
                 <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors relative h-40">
                     <input
@@ -226,7 +228,7 @@ export function ProductForm({ initialData, businessId, onSuccess }: ProductFormP
                 </div>
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2" data-tour="product-available">
                 <Checkbox
                     id="available"
                     checked={formData.isAvailable}
@@ -237,7 +239,7 @@ export function ProductForm({ initialData, businessId, onSuccess }: ProductFormP
                 </Label>
             </div>
 
-            <Button type="submit" disabled={isLoading} className="w-full">
+            <Button type="submit" disabled={isLoading} className="w-full" data-tour="submit-product">
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {initialData ? 'Actualizar Producto' : 'Crear Producto'}
             </Button>

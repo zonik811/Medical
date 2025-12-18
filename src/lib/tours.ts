@@ -76,6 +76,81 @@ export const productsTour: DriveStep[] = [
     }
 ];
 
+export const createProductTour: DriveStep[] = [
+    {
+        element: "[data-tour='product-name']",
+        popover: {
+            title: "📝 Nombre del Producto",
+            description: "Ingresa el nombre del producto que quieres vender. Ejemplo: 'Hamburguesa Clásica', 'Camisa Azul', etc.",
+            side: "right",
+            align: "start"
+        }
+    },
+    {
+        element: "[data-tour='product-description']",
+        popover: {
+            title: "📄 Descripción",
+            description: "Describe el producto: ingredientes, materiales, características especiales. Esto ayuda a los clientes a conocer mejor el producto.",
+            side: "right",
+            align: "start"
+        }
+    },
+    {
+        element: "[data-tour='product-price']",
+        popover: {
+            title: "💰 Precio",
+            description: "Define el precio de venta del producto. Solo números, el símbolo $ se agrega automáticamente.",
+            side: "left",
+            align: "start"
+        }
+    },
+    {
+        element: "[data-tour='product-category']",
+        popover: {
+            title: "🏷️ Categoría",
+            description: "Selecciona una categoría existente o crea una nueva con el botón +. Las categorías ayudan a organizar tus productos.",
+            side: "left",
+            align: "start"
+        }
+    },
+    {
+        element: "[data-tour='category-create']",
+        popover: {
+            title: "➕ Crear Categoría Nueva",
+            description: "Si no encuentras la categoría que necesitas, haz clic aquí para crear una nueva categoría al instante.",
+            side: "left",
+            align: "center"
+        }
+    },
+    {
+        element: "[data-tour='product-image']",
+        popover: {
+            title: "📸 Imagen del Producto",
+            description: "Sube una foto del producto. Haz clic en el área o arrastra una imagen. Una buena foto ayuda a vender más.",
+            side: "top",
+            align: "center"
+        }
+    },
+    {
+        element: "[data-tour='product-available']",
+        popover: {
+            title: "✅ Producto Disponible",
+            description: "Marca esta casilla si el producto está disponible para venta. Desmárcala si está temporalmente agotado.",
+            side: "right",
+            align: "start"
+        }
+    },
+    {
+        element: "[data-tour='submit-product']",
+        popover: {
+            title: "💾 Guardar Producto",
+            description: "Cuando hayas llenado todos los campos, haz clic aquí para guardar el producto. Aparecerá inmediatamente en tu catálogo.",
+            side: "top",
+            align: "center"
+        }
+    }
+];
+
 export const categoriesTour: DriveStep[] = [
     {
         element: "#create-category-btn",
