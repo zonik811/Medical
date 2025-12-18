@@ -24,8 +24,8 @@ import { useCartStore } from "@/lib/store/cart-store";
 
 const DEFAULT_CONFIG: LandingConfig['config'] = {
   hero: {
-    title: "Bienvenido a Nuestro Catálogo",
-    subtitle: "Descubre productos increíbles con la mejor calidad y servicio",
+    title: "Mundilab tu aliado estratégico en el sector de la salud",
+    subtitle: "Importadores y distribuidores de soluciones integrales para el sector salud, con un amplio portafolio que cubre equipos, insumos y tecnologías para múltiples entornos de atención.",
     buttonText: "Ver Catálogo Completo"
   },
   features: [
