@@ -174,14 +174,14 @@ export default function LandingPage() {
         {/* Background with Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70 z-10" />
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-30"
+          className="absolute inset-0 bg-cover bg-center opacity-60"
           style={{ backgroundImage: "url('/hero-bg.jpg')" }}
         />
 
         {/* Content */}
         <div className="relative z-20 max-w-7xl mx-auto px-4 md:px-8 text-center text-white">
           <motion.h1
-            className="text-4xl md:text-6xl font-bold mb-6"
+            className="text-4xl md:text-6xl font-bold mb-6 text-primary"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -189,7 +189,7 @@ export default function LandingPage() {
             {config.hero.title}
           </motion.h1>
           <motion.p
-            className="text-lg md:text-xl mb-8 max-w-2xl mx-auto opacity-90"
+            className="text-lg md:text-xl mb-8 max-w-2xl mx-auto opacity-90 text-secondary"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -218,14 +218,14 @@ export default function LandingPage() {
       <section className="py-20 bg-secondary/5" id="features">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground text-primary">
               ¿Por Qué Elegirnos?
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-secondary">
               Comprometidos con la excelencia en cada detalle
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-primary">
             {config.features.map((feature, index) => {
               const Icon = getIcon(feature.icon);
               return (
@@ -240,10 +240,10 @@ export default function LandingPage() {
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
                     <Icon className="text-primary" size={28} />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 text-center text-foreground">
+                  <h3 className="text-lg font-semibold mb-2 text-center text-foreground text-secondary">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground text-center text-sm">
+                  <p className="text-muted-foreground text-center text-sm text-secondary">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -261,20 +261,20 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-bold mb-6 text-foreground">{config.about.title}</h2>
-            <p className="text-lg mb-8 text-muted-foreground">
+            <h2 className="text-4xl font-bold mb-6 text-foreground text-primary">{config.about.title}</h2>
+            <p className="text-lg mb-8 text-muted-foreground text-primary">
               {config.about.description}
             </p>
             <div className="grid md:grid-cols-2 gap-6 mt-8">
               {config.about.mission && (
                 <div className="bg-card p-6 rounded-lg border hover:shadow-md transition-shadow">
-                  <h3 className="font-semibold text-primary mb-2 text-lg">Misión</h3>
+                  <h3 className="font-semibold text-primary mb-2 text-lg text-secondary">Misión</h3>
                   <p className="text-foreground">{config.about.mission}</p>
                 </div>
               )}
               {config.about.vision && (
                 <div className="bg-card p-6 rounded-lg border hover:shadow-md transition-shadow">
-                  <h3 className="font-semibold text-primary mb-2 text-lg">Visión</h3>
+                  <h3 className="font-semibold text-primary mb-2 text-lg text-secondary">Visión</h3>
                   <p className="text-foreground">{config.about.vision}</p>
                 </div>
               )}
@@ -287,10 +287,10 @@ export default function LandingPage() {
       <section className="py-20 bg-secondary/5" id="catalog">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground text-primary">
               Explora Nuestras Categorías
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-secondary">
               Encuentra lo que necesitas organizado por categorías
             </p>
           </div>
@@ -351,9 +351,9 @@ export default function LandingPage() {
         <section id="brands" className="py-16 px-4 overflow-hidden bg-background">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4 text-foreground">{config.brands.title}</h2>
+              <h2 className="text-3xl font-bold mb-4 text-foreground text-primary">{config.brands.title}</h2>
               {config.brands.subtitle && (
-                <p className="text-muted-foreground">{config.brands.subtitle}</p>
+                <p className="text-muted-foreground text-secondary">{config.brands.subtitle}</p>
               )}
             </div>
 
@@ -438,9 +438,9 @@ export default function LandingPage() {
         <section id="faq" className="py-20 px-4 bg-secondary/5">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4 text-foreground">{config.faq.title}</h2>
+              <h2 className="text-4xl font-bold mb-4 text-foreground text-primary">{config.faq.title}</h2>
               {config.faq.subtitle && (
-                <p className="text-lg text-muted-foreground">{config.faq.subtitle}</p>
+                <p className="text-lg text-muted-foreground text-secondary">{config.faq.subtitle}</p>
               )}
             </div>
             <div className="space-y-4">
@@ -521,8 +521,8 @@ export default function LandingPage() {
                   <Truck className="text-primary" size={24} />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground">Envíos a Nivel Nacional</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-semibold text-foreground text-primary  ">Envíos a Nivel Nacional</p>
+                  <p className="text-sm text-muted-foreground text-primary ">
                     Despachamos a toda Colombia
                   </p>
                 </div>
@@ -532,8 +532,8 @@ export default function LandingPage() {
                   <MapPin className="text-primary" size={24} />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground">Ubicación en Bogotá</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-semibold text-foreground text-primary ">Ubicación en Bogotá</p>
+                  <p className="text-sm text-muted-foreground text-primary ">
                     Distribución desde Bogotá
                   </p>
                 </div>
@@ -543,8 +543,8 @@ export default function LandingPage() {
                   <Star className="text-primary" size={24} />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground">Compra Segura en Línea</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-semibold text-foreground text-primary">Compra Segura en Línea</p>
+                  <p className="text-sm text-muted-foreground text-primary">
                     Transacciones protegidas
                   </p>
                 </div>
@@ -554,8 +554,8 @@ export default function LandingPage() {
                   <MessageCircle className="text-primary" size={24} />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground">Asesoría y Cumplimiento</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-semibold text-foreground text-primary">Asesoría y Cumplimiento</p>
+                  <p className="text-sm text-muted-foreground text-primary">
                     Calidad y soporte garantizado
                   </p>
                 </div>
@@ -572,7 +572,7 @@ export default function LandingPage() {
               <h3 className="font-bold text-lg mb-4 text-primary">
                 Nosotros
               </h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-muted-foreground mb-4 text-primary ">
                 {config.footer.description}
               </p>
               <div className="flex gap-3">
@@ -620,7 +620,7 @@ export default function LandingPage() {
                     href="/shop"
                     className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
                   >
-                    <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight size={16} className="text-primary group-hover:translate-x-1 transition-transform" />
                     Catálogo
                   </Link>
                 </li>
@@ -629,7 +629,7 @@ export default function LandingPage() {
                     href="/#about"
                     className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
                   >
-                    <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight size={16} className="text-primary  group-hover:translate-x-1 transition-transform" />
                     Nosotros
                   </Link>
                 </li>
@@ -638,7 +638,7 @@ export default function LandingPage() {
                     href="/#faq"
                     className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
                   >
-                    <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight size={16} className="text-primary group-hover:translate-x-1 transition-transform" />
                     Preguntas Frecuentes
                   </Link>
                 </li>
@@ -657,7 +657,7 @@ export default function LandingPage() {
                       href={`/shop?category=${cat.slug}`}
                       className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
                     >
-                      <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight size={16} className="text-primary group-hover:translate-x-1 transition-transform" />
                       {cat.name}
                     </Link>
                   </li>
