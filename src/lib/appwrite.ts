@@ -26,6 +26,7 @@ export const appwriteConfig = {
     },
     buckets: {
         productImages: 'product-images',
+        brandLogos: 'brand-logos',
     }
 };
 

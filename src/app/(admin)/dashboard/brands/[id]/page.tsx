@@ -6,9 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Upload, X, ImagePlus } from "lucide-react";
 import { api } from "@/services/api";
 import { useBusinessStore } from "@/lib/store/business-store";
+import { storage, appwriteConfig } from "@/lib/appwrite";
+import { ID } from "appwrite";
 import { Brand } from "@/types";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -19,6 +21,7 @@ export default function EditBrandPage() {
     const { business } = useBusinessStore();
     const [brand, setBrand] = useState<Brand | null>(null);
     const [saving, setSaving] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [formData, setFormData] = useState({
         name: "",
@@ -59,6 +62,47 @@ export default function EditBrandPage() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            toast.error("Por favor selecciona una imagen");
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("La imagen no puede ser mayor a 5MB");
+            return;
+        }
+
+        try {
+            setUploading(true);
+            const response = await storage.createFile(
+                appwriteConfig.buckets.brandLogos,
+                ID.unique(),
+                file
+            );
+
+            const fileUrl = storage.getFileView(
+                appwriteConfig.buckets.brandLogos,
+                response.$id
+            );
+
+            setFormData({ ...formData, logo: fileUrl.toString() });
+            toast.success("Imagen subida correctamente");
+        } catch (error: any) {
+            console.error("Error uploading file:", error);
+            toast.error("Error al subir la imagen");
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleRemoveFile = () => {
+        setFormData({ ...formData, logo: "" });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -145,32 +189,82 @@ export default function EditBrandPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="logo">
-                                URL del Logo <span className="text-red-500">*</span>
+                            <Label>
+                                Logo de la Marca <span className="text-red-500">*</span>
                             </Label>
+
+                            <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                                {formData.logo ? (
+                                    <div className="space-y-4">
+                                        <div className="bg-muted rounded-lg p-6 flex items-center justify-center h-40">
+                                            <img
+                                                src={formData.logo}
+                                                alt="Preview"
+                                                className="max-h-full max-w-full object-contain"
+                                            />
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={handleRemoveFile}
+                                                className="flex-1"
+                                            >
+                                                <X className="w-4 h-4 mr-2" />
+                                                Eliminar
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => document.getElementById('file-upload')?.click()}
+                                                disabled={uploading}
+                                                className="flex-1"
+                                            >
+                                                <Upload className="w-4 h-4 mr-2" />
+                                                Cambiar
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <label htmlFor="file-upload" className="cursor-pointer">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <div className="rounded-full bg-primary/10 p-4">
+                                                <ImagePlus className="w-8 h-8 text-primary" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium">
+                                                    {uploading ? "Subiendo imagen..." : "Click para subir imagen"}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    PNG, JPG SVG (max. 5MB)
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                )}
+                            </div>
+
+                            <input
+                                id="file-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                                className="hidden"
+                                disabled={uploading}
+                            />
+
+                            <p className="text-sm text-muted-foreground">
+                                O ingresa una URL directamente:
+                            </p>
                             <Input
-                                id="logo"
                                 type="url"
                                 value={formData.logo}
                                 onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
                                 placeholder="https://ejemplo.com/logo.png"
-                                required
+                                disabled={uploading}
                             />
-                            {formData.logo && (
-                                <div className="mt-4 p-6 bg-muted rounded-lg flex items-center justify-center h-40">
-                                    <img
-                                        src={formData.logo}
-                                        alt="Preview"
-                                        className="max-h-full max-w-full object-contain"
-                                        onError={(e) => {
-                                            e.currentTarget.style.display = "none";
-                                        }}
-                                    />
-                                </div>
-                            )}
-                            <p className="text-sm text-muted-foreground">
-                                Sube la imagen a un servicio como Imgur o usa una URL pública
-                            </p>
                         </div>
 
                         <div className="space-y-2">
@@ -221,7 +315,7 @@ export default function EditBrandPage() {
                         <div className="flex gap-3 pt-4">
                             <Button
                                 type="submit"
-                                disabled={saving}
+                                disabled={saving || uploading}
                                 className="flex-1"
                             >
                                 {saving ? (
