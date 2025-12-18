@@ -1,0 +1,72 @@
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-primary text-white" id="testimonials">
+        <div className="max-w-4xl mx-auto px-4 md:px-8">
+          <div className="text-center mb-12">
+            <p className="text-sm uppercase tracking-wider mb-2 opacity-90">
+              Nuestros Clientes Opinan
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold">
+              Experiencias Que Generan Confianza
+            </h2>
+          </div>
+
+          <div className="relative">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentTestimonial}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                className="text-center"
+              >
+                <div className="flex justify-center mb-4">
+                  {[...Array(TESTIMONIALS[currentTestimonial].rating)].map((_, i) => (
+                    <Star key={i} className="fill-yellow-400 text-yellow-400" size={24} />
+                  ))}
+                </div>
+                <p className="text-lg md:text-xl mb-6 italic leading-relaxed">
+                  "{TESTIMONIALS[currentTestimonial].content}"
+                </p>
+                <p className="font-semibold text-xl">
+                  {TESTIMONIALS[currentTestimonial].name}
+                </p>
+                <p className="text-sm opacity-80">
+                  {TESTIMONIALS[currentTestimonial].position}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+
+            <div className="flex justify-center gap-4 mt-8">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={prevTestimonial}
+                className="bg-white/20 hover:bg-white/30 text-white"
+              >
+                <ChevronLeft size={24} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={nextTestimonial}
+                className="bg-white/20 hover:bg-white/30 text-white"
+              >
+                <ChevronRight size={24} />
+              </Button>
+            </div>
+
+            <div className="flex justify-center gap-2 mt-4">
+              {TESTIMONIALS.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentTestimonial(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentTestimonial ? 'bg-white w-8' : 'bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>

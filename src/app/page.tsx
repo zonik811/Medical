@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { api } from "@/services/api";
 import { Product, LandingConfig, FAQ, Brand } from "@/types";
-import { ArrowRight, Truck, Star, MessageCircle, DollarSign, ChevronDown } from "lucide-react";
-import { motion } from "framer-motion";
+import { ArrowRight, Truck, Star, MessageCircle, DollarSign, ChevronDown, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Send } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { LandingNavbar } from "@/components/landing/landing-navbar";
 import { ProductCard } from "@/components/shop/product-card";
 import { useCartStore } from "@/lib/store/cart-store";
@@ -58,13 +59,45 @@ const DEFAULT_CONFIG: LandingConfig['config'] = {
   }
 };
 
+// Sample testimonials (hardcoded for now)
+const TESTIMONIALS = [
+  {
+    name: "María González",
+    position: "Cliente Satisfecho",
+    content: "Excelente servicio y productos de alta calidad. La entrega fue rápida y todo llegó en perfectas condiciones. Muy recomendado.",
+    rating: 5
+  },
+  {
+    name: "Carlos Rodríguez",
+    position: "Empresa ABC",
+    content: "Llevamos años trabajando con ellos y siempre nos brindan el mejor soporte. Los productos son exactamente lo que necesitamos.",
+    rating: 5
+  },
+  {
+    name: "Ana Martínez",
+    position: "Consultorio Médico",
+    content: "Profesionales y confiables. Los productos llegaron a tiempo y la asesoría personalizada fue excelente.",
+    rating: 5
+  }
+];
+
+interface Category {
+  $id: string;
+  name: string;
+  slug: string;
+  description?: string;
+}
+
 export default function LandingPage() {
   const [config, setConfig] = useState<LandingConfig['config']>(DEFAULT_CONFIG);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({});
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [businessId] = useState(process.env.NEXT_PUBLIC_BUSINESS_ID || "");
   const [openFaq, setOpenFaq] = useState<string | null>(null);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const { addItem } = useCartStore();
 
   useEffect(() => {
@@ -81,8 +114,40 @@ export default function LandingPage() {
 
       // Load products
       const productsResponse = await api.products.list(businessId);
+      const allProducts = productsResponse.documents;
       const count = landingConfig?.config.products.count || 6;
-      setFeaturedProducts(productsResponse.documents.slice(0, count));
+      setFeaturedProducts(allProducts.slice(0, count));
+
+      // Group products by category (get unique categories from products)
+      const categoriesMap: Record<string, { name: string; products: Product[] }> = {};
+
+      allProducts.forEach((product: Product) => {
+        const categoryId = product.categoryId || 'uncategorized';
+        const categoryName = `Categoría ${categoryId.substring(0, 8)}`;
+
+        if (!categoriesMap[categoryId]) {
+          categoriesMap[categoryId] = { name: categoryName, products: [] };
+        }
+        categoriesMap[categoryId].products.push(product);
+      });
+
+      // Convert to categories array (take first 4)
+      const cats = Object.entries(categoriesMap)
+        .map(([id, data]) => ({
+          $id: id,
+          name: data.name,
+          slug: data.name.toLowerCase().replace(/\s+/g, '-')
+        }))
+        .slice(0, 4);
+
+      setCategories(cats);
+
+      // Set products by category (max 4 products per category)
+      const prodsByCat: Record<string, Product[]> = {};
+      cats.forEach(cat => {
+        prodsByCat[cat.$id] = categoriesMap[cat.$id].products.slice(0, 4);
+      });
+      setProductsByCategory(prodsByCat);
 
       // Load FAQs
       const faqsList = await api.faq.list(businessId);
@@ -101,60 +166,93 @@ export default function LandingPage() {
     return icons[iconName] || Star;
   };
 
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev + 1) % TESTIMONIALS.length);
+  };
+
+  const prevTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+  };
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--background)' }}>
       <LandingNavbar />
 
-      {/* Hero Section */}
-      <section id="hero" className="relative text-white py-32 px-4 overflow-hidden" style={{
-        background: 'linear-gradient(135deg, var(--primary), var(--secondary))'
-      }}>
-        <div className="max-w-6xl mx-auto text-center relative z-10">
+      {/* Hero Section with Background */}
+      <section className="relative h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70 z-10" />
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-30"
+          style={{ backgroundImage: "url('/hero-bg.jpg')" }}
+        />
+
+        {/* Content */}
+        <div className="relative z-20 max-w-7xl mx-auto px-4 md:px-8 text-center text-white">
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            className="text-4xl md:text-6xl font-bold mb-6"
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-black mb-6"
+            transition={{ duration: 0.6 }}
           >
             {config.hero.title}
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            className="text-lg md:text-xl mb-8 max-w-2xl mx-auto opacity-90"
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto"
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
             {config.hero.subtitle}
           </motion.p>
-          <Link href="/shop">
-            <Button size="lg" className="text-lg px-12 h-16 bg-white hover:bg-white/90" style={{ color: 'var(--primary)' }}>
-              {config.hero.buttonText}
-              <ArrowRight className="ml-2 w-6 h-6" />
-            </Button>
-          </Link>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Link href="/shop">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold px-8">
+                {config.hero.buttonText}
+                <ArrowRight className="ml-2" size={20} />
+              </Button>
+            </Link>
+          </motion.div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-6">
-          {config.features.map((feature, i) => {
-            const Icon = getIcon(feature.icon);
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="p-6 rounded-2xl shadow-lg text-center"
-                style={{ background: 'var(--surface)' }}
-              >
-                <Icon className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--primary)' }} />
-                <h3 className="font-bold text-lg mb-2">{feature.title}</h3>
-                <p className="text-sm" style={{ color: 'var(--muted)' }}>{feature.description}</p>
-              </motion.div>
-            );
-          })}
+      {/* Features Section */}
+      <section className="py-20 bg-muted/30" id="features">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              ¿Por Qué Elegirnos?
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {config.features.map((feature, index) => {
+              const Icon = getIcon(feature.icon);
+              return (
+                <motion.div
+                  key={index}
+                  className="bg-card p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <Icon className="text-primary" size={28} />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2 text-center text-primary">
+                    {feature.title}
+                  </h3>
+                  <p className="text-muted-foreground text-center text-sm">
+                    {feature.description}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -172,25 +270,48 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
+      {/* Categories Catalog Section */}
+      <section className="py-20" id="catalog">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">{config.products.title}</h2>
-            {config.products.subtitle && (
-              <p className="text-lg" style={{ color: 'var(--muted)' }}>{config.products.subtitle}</p>
-            )}
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Explora Nuestras Categorías
+            </h2>
+            <p className="text-muted-foreground">
+              Encuentra lo que necesitas organizado por categorías
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.$id} product={product} onAddToCart={addItem} />
+
+          <div className="space-y-16">
+            {categories.map((category, catIndex) => (
+              <motion.div
+                key={category.$id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: catIndex * 0.1 }}
+              >
+                <h3 className="text-2xl font-bold mb-6 text-primary">
+                  {category.name}
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {productsByCategory[category.$id]?.map((product) => (
+                    <ProductCard
+                      key={product.$id}
+                      product={product}
+                      onAddToCart={() => addItem(product)}
+                    />
+                  ))}
+                </div>
+              </motion.div>
             ))}
           </div>
-          <div className="text-center">
+
+          <div className="text-center mt-12">
             <Link href="/shop">
-              <Button size="lg">
+              <Button size="lg" className="px-8">
                 Ver Todo el Catálogo
-                <ArrowRight className="ml-2" />
+                <ArrowRight className="ml-2" size={20} />
               </Button>
             </Link>
           </div>
@@ -333,12 +454,124 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4" style={{ background: 'var(--surface)' }}>
-        <div className="max-w-7xl mx-auto text-center">
-          {config.footer.description && (
-            <p className="mb-4" style={{ color: 'var(--muted)' }}>{config.footer.description}</p>
-          )}
-          <p className="text-sm" style={{ color: 'var(--muted)' }}>{config.footer.copyright}</p>
+      <footer className="bg-card border-t">
+        {/* Mini features */}
+        <div className="border-b">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="flex items-center gap-3">
+                <Truck className="text-primary" size={32} />
+                <div>
+                  <p className="font-semibold">Envíos a Nivel Nacional</p>
+                  <p className="text-sm text-muted-foreground">Despachamos a toda Colombia.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <MapPin className="text-primary" size={32} />
+                <div>
+                  <p className="font-semibold">Ubicación en Bogotá</p>
+                  <p className="text-sm text-muted-foreground">Distribución desde Bogotá.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Star className="text-primary" size={32} />
+                <div>
+                  <p className="font-semibold">Compra Segura en Línea</p>
+                  <p className="text-sm text-muted-foreground">Transacciones protegidas.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <MessageCircle className="text-primary" size={32} />
+                <div>
+                  <p className="font-semibold">Asesoría y Cumplimiento</p>
+                  <p className="text-sm text-muted-foreground">Calidad y soporte garantizado.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main footer content */}
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* About */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-primary border-b-2 border-primary pb-2 inline-block">Nosotros</h3>
+              <p className="text-sm text-muted-foreground mb-4 mt-4">
+                {config.footer.description}
+              </p>
+              <div className="flex gap-3">
+                <a href="#" className="w-10 h-10 bg-black rounded-full flex items-center justify-center hover:bg-black/80 transition-colors">
+                  <span className="text-white text-lg">f</span>
+                </a>
+                <a href="#" className="w-10 h-10 bg-black rounded-full flex items-center justify-center hover:bg-black/80 transition-colors">
+                  <span className="text-white text-lg">in</span>
+                </a>
+                <a href="#" className="w-10 h-10 bg-black rounded-full flex items-center justify-center hover:bg-black/80 transition-colors">
+                  <span className="text-white text-lg">W</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Menu */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-primary border-b-2 border-primary pb-2 inline-block">Menú</h3>
+              <ul className="space-y-2 text-sm mt-4">
+                <li><Link href="/" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><ChevronRight size={16} />Inicio</Link></li>
+                <li><Link href="/shop" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><ChevronRight size={16} />Equipos</Link></li>
+                <li><Link href="/shop" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><ChevronRight size={16} />Insumos</Link></li>
+                <li><Link href="/shop" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><ChevronRight size={16} />Ropa</Link></li>
+                <li><Link href="/shop" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><ChevronRight size={16} />EPP</Link></li>
+              </ul>
+            </div>
+
+            {/* Categories */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-primary border-b-2 border-primary pb-2 inline-block">Categorías</h3>
+              <ul className="space-y-2 text-sm mt-4">
+                {categories.slice(0, 5).map(cat => (
+                  <li key={cat.$id}>
+                    <Link href="/shop" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                      <ChevronRight size={16} />{cat.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Newsletter */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-primary border-b-2 border-primary pb-2 inline-block">Suscríbete</h3>
+              <p className="text-sm text-muted-foreground mb-4 mt-4">
+                Déjanos tu correo y recibe información valiosa junto con las ofertas que tenemos
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="Email"
+                  className="flex-1 px-3 py-2 rounded-lg bg-muted border border-border text-sm"
+                />
+                <Button size="icon" className="flex-shrink-0">
+                  <Send size={18} />
+                </Button>
+              </div>
+              <div className="mt-4 flex items-center gap-2">
+                <input type="checkbox" id="newsletter-accept" className="rounded" />
+                <label htmlFor="newsletter-accept" className="text-xs text-muted-foreground">
+                  Acepto recibir correos
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Copyright */}
+        <div className="border-t">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-6">
+            <p className="text-center text-sm text-muted-foreground">
+              {config.footer.copyright}
+            </p>
+          </div>
         </div>
       </footer>
     </div>
