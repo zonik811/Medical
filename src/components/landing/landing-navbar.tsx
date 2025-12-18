@@ -37,10 +37,10 @@ export function LandingNavbar() {
             }}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
+                <div className="flex justify-between items-center h-20">
                     {/* Logo */}
                     <Link href="/" className="flex items-center">
-                        <img src="/Logo.png" alt="Logo" className="h-16 w-auto" />
+                        <img src="/Logo.png" alt="Logo" className="h-20 w-auto" />
                     </Link>
 
                     {/* Desktop Navigation */}
@@ -50,7 +50,7 @@ export function LandingNavbar() {
                                 <Link
                                     key={index}
                                     href={link.href}
-                                    className="font-medium hover:opacity-70 transition-opacity"
+                                    className="text-lg font-medium hover:opacity-70 transition-opacity"
                                     style={{ color: 'var(--text)' }}
                                 >
                                     {link.label}
@@ -59,7 +59,7 @@ export function LandingNavbar() {
                                 <button
                                     key={index}
                                     onClick={link.action}
-                                    className="font-medium hover:opacity-70 transition-opacity"
+                                    className="text-lg font-medium hover:opacity-70 transition-opacity"
                                     style={{ color: 'var(--text)' }}
                                 >
                                     {link.label}
@@ -69,10 +69,10 @@ export function LandingNavbar() {
 
                         {/* Cart Icon */}
                         <Link href="/shop">
-                            <Button size="sm" className="relative">
+                            <Button size="default" className="relative">
                                 <ShoppingCart className="w-5 h-5" />
                                 {itemCount > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
                                         {itemCount}
                                     </span>
                                 )}
@@ -103,7 +103,7 @@ export function LandingNavbar() {
                                 <Link
                                     key={index}
                                     href={link.href}
-                                    className="block py-2 font-medium"
+                                    className="block py-3 text-lg font-medium"
                                     style={{ color: 'var(--text)' }}
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
@@ -113,7 +113,7 @@ export function LandingNavbar() {
                                 <button
                                     key={index}
                                     onClick={link.action}
-                                    className="block w-full text-left py-2 font-medium"
+                                    className="block w-full text-left py-3 text-lg font-medium"
                                     style={{ color: 'var(--text)' }}
                                 >
                                     {link.label}

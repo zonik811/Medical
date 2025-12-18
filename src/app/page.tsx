@@ -550,7 +550,7 @@ export default function LandingPage() {
           {/* Animated background */}
           <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 via-background to-primary/10" />
 
-          <div className="relative z-10 max-w-3xl mx-auto">
+          <div className="text-primary relative z-10 max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <motion.h2
                 className="text-primary text-4xl font-bold mb-4"
@@ -665,7 +665,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="bg-card border-t">
         {/* Mini features */}
-        <div className="text-primary border-b">
+        <div className="text-primaryborder-b">
           <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="flex items-center gap-3">
