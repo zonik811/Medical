@@ -521,11 +521,77 @@ export default function LandingPage() {
                 ))}
               </div>
             </div>
+            <div className="overflow-hidden mt-8">
+              <div className="relative">
+                <div className="flex gap-12 animate-marquee-reverse">
+                  {brands.map((brand) => (
+                    <div
+                      key={`${brand.$id}-row2`}
+                      className="flex-shrink-0 flex items-center justify-center p-6 rounded-lg transition-all hover:scale-110 bg-card/50 backdrop-blur-sm border"
+                    >
+                      {brand.url ? (
+                        <a href={brand.url} target="_blank" rel="noopener noreferrer">
+                          <img
+                            src={brand.logo}
+                            alt={brand.name}
+                            className="h-20 w-auto grayscale hover:grayscale-0 transition-all object-contain"
+                          />
+                        </a>
+                      ) : (
+                        <img
+                          src={brand.logo}
+                          alt={brand.name}
+                          className="h-20 w-auto grayscale hover:grayscale-0 transition-all object-contain"
+                        />
+                      )}
+                    </div>
+                  ))}
+                  {brands.map((brand) => (
+                    <div
+                      key={`${brand.$id}-row2-duplicate`}
+                      className="flex-shrink-0 flex items-center justify-center p-6 rounded-lg transition-all hover:scale-110 bg-card/50 backdrop-blur-sm border"
+                    >
+                      {brand.url ? (
+                        <a href={brand.url} target="_blank" rel="noopener noreferrer">
+                          <img
+                            src={brand.logo}
+                            alt={brand.name}
+                            className="h-20 w-auto grayscale hover:grayscale-0 transition-all object-contain"
+                          />
+                        </a>
+                      ) : (
+                        <img
+                          src={brand.logo}
+                          alt={brand.name}
+                          className="h-20 w-auto grayscale hover:grayscale-0 transition-all object-contain"
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
       )}
 
       <style jsx>{`
+
+      @keyframes marquee-reverse {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+.animate-marquee-reverse {
+  animation: marquee-reverse 12s linear infinite;
+}
+.animate-marquee-reverse:hover {
+  animation-play-state: paused;
+}
         @keyframes marquee {
           0% {
             transform: translateX(0);
