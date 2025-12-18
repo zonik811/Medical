@@ -2,13 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Pencil, Trash2, Loader2, RefreshCcw, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, RefreshCcw, Package, HelpCircle } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Product } from "@/types";
 import Link from "next/link";
 import { api } from "@/services/api";
 import { StockModal } from "@/components/admin/stock-modal";
+import { productsTour, startTour } from "@/lib/tours";
+import { useBusinessStore } from "@/lib/store/business-store";
 
 export default function ProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -16,12 +18,14 @@ export default function ProductsPage() {
     const [error, setError] = useState(false);
     const [stockModalOpen, setStockModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const { business } = useBusinessStore();
 
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            // 'demo' was hardcoded. Now using real business ID.
-            const response = await api.products.list('694335e800262290919c');
+            // Using dynamic business ID from store
+            if (!business) return;
+            const response = await api.products.list(business.$id);
             if (response.documents.length > 0) {
                 setProducts(response.documents as unknown as Product[]);
             } else {
@@ -59,11 +63,31 @@ export default function ProductsPage() {
                     <h2 className="text-3xl font-bold tracking-tight">Productos</h2>
                     <p className="text-muted-foreground">Gestiona tu catálogo de productos.</p>
                 </div>
-                <Link href="/dashboard/products/create">
-                    <Button className="gap-2">
-                        <Plus size={18} /> Nuevo Producto
+                <div className="flex gap-2">
+                    {/* NUEVO: Botón de ayuda */}
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => startTour(productsTour)}
+                        title="Ver guía de productos"
+                    >
+                        <HelpCircle className="h-5 w-5" />
                     </Button>
-                </Link>
+
+                    <Button
+                        variant="outline"
+                        onClick={fetchProducts}
+                        disabled={loading}
+                    >
+                        <RefreshCcw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                        Actualizar
+                    </Button>
+                    <Link href="/dashboard/products/create">
+                        <Button id="create-product-btn">
+                            <Plus className="mr-2 h-4 w-4" /> Nuevo Producto
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             <Card>
@@ -88,9 +112,13 @@ export default function ProductsPage() {
                             <p className="text-sm">¡Crea el primero arriba!</p>
                         </div>
                     ) : (
-                        <div className="space-y-4">
-                            {products.map((product) => (
-                                <div key={product.$id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
+                        <div id="products-grid" className="space-y-4">
+                            {products.map((product, index) => (
+                                <div
+                                    key={product.$id}
+                                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
+                                    data-tour={index === 0 ? "product-card" : undefined}
+                                >
                                     <div className="flex items-center gap-4">
                                         <div className="relative h-16 w-16 overflow-hidden rounded-md bg-slate-100 dark:bg-slate-800">
                                             {product.imageUrl ? (
@@ -112,10 +140,13 @@ export default function ProductsPage() {
                                                     {product.isAvailable ? 'Disponible' : 'Agotado'}
                                                 </span>
                                                 {product.stock !== undefined && (
-                                                    <span className={`text-xs px-2 py-1 rounded-full ${product.stock === 0 ? 'bg-red-100 text-red-700' :
-                                                        product.stock <= 5 ? 'bg-yellow-100 text-yellow-700' :
-                                                            'bg-blue-100 text-blue-700'
-                                                        }`}>
+                                                    <span
+                                                        className={`text-xs px-2 py-1 rounded-full ${product.stock === 0 ? 'bg-red-100 text-red-700' :
+                                                            product.stock <= 5 ? 'bg-yellow-100 text-yellow-700' :
+                                                                'bg-blue-100 text-blue-700'
+                                                            }`}
+                                                        data-tour={index === 0 ? "product-stock" : undefined}
+                                                    >
                                                         Stock: {product.stock}
                                                     </span>
                                                 )}
@@ -135,11 +166,20 @@ export default function ProductsPage() {
                                             <Package size={18} className="text-purple-500" />
                                         </Button>
                                         <Link href={`/dashboard/products/${product.$id}`}>
-                                            <Button variant="ghost" size="icon">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                data-tour={index === 0 ? "edit-product" : undefined}
+                                            >
                                                 <Pencil size={18} className="text-blue-500" />
                                             </Button>
                                         </Link>
-                                        <Button variant="ghost" size="icon" onClick={() => handleDelete(product.$id)}>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleDelete(product.$id)}
+                                            data-tour={index === 0 ? "delete-product" : undefined}
+                                        >
                                             <Trash2 size={18} className="text-red-500" />
                                         </Button>
                                     </div>

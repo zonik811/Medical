@@ -9,7 +9,10 @@ export const api = {
             const productsResponse = await databases.listDocuments(
                 appwriteConfig.databaseId,
                 appwriteConfig.collections.products,
-                [Query.equal('businessId', businessId)]
+                [
+                    Query.equal('businessId', businessId),
+                    Query.limit(1000)  // Increase from default 25 to 1000
+                ]
             );
 
             // Fetch discounts and inventory
@@ -17,12 +20,18 @@ export const api = {
                 databases.listDocuments(
                     appwriteConfig.databaseId,
                     appwriteConfig.collections.discounts,
-                    [Query.equal('businessId', businessId)]
+                    [
+                        Query.equal('businessId', businessId),
+                        Query.limit(1000)
+                    ]
                 ),
                 databases.listDocuments(
                     appwriteConfig.databaseId,
                     appwriteConfig.collections.inventory,
-                    [Query.equal('businessId', businessId)]
+                    [
+                        Query.equal('businessId', businessId),
+                        Query.limit(1000)
+                    ]
                 )
             ]);
 
