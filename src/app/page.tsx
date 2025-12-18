@@ -531,12 +531,12 @@ export default function LandingPage() {
             transform: translateX(0);
           }
           100% {
-            transform: translateX(-50%);
+            transform: translateX(-100%);
           }
         }
         
         .animate-marquee {
-          animation: marquee 15s linear infinite;
+          animation: marquee 12s linear infinite;
         }
         
         .animate-marquee:hover {
