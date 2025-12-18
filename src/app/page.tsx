@@ -17,7 +17,7 @@ import {
   Send,
   Loader2
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { LandingNavbar } from "@/components/landing/landing-navbar";
 import { ProductCard } from "@/components/shop/product-card";
 import { useCartStore } from "@/lib/store/cart-store";
@@ -77,7 +77,6 @@ interface Category {
 }
 
 export default function LandingPage() {
-  // Estados
   const [config, setConfig] = useState<LandingConfig['config']>(DEFAULT_CONFIG);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -90,6 +89,11 @@ export default function LandingPage() {
   const [email, setEmail] = useState("");
 
   const { addItem } = useCartStore();
+  const { scrollY } = useScroll();
+
+  // Parallax effect for hero
+  const heroY = useTransform(scrollY, [0, 500], [0, 150]);
+  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   useEffect(() => {
     loadLandingData();
@@ -99,25 +103,21 @@ export default function LandingPage() {
     try {
       setIsLoading(true);
 
-      // Load config
       const landingConfig = await api.landingConfig.get(businessId);
       if (landingConfig) {
         setConfig(landingConfig.config);
       }
 
-      // Load products
       const productsResponse = await api.products.list(businessId);
       const allProducts = productsResponse.documents;
       const count = landingConfig?.config.products.count || 6;
       setFeaturedProducts(allProducts.slice(0, count));
 
-      // Load categories from API
       const categoriesResponse = await api.categories.list(businessId);
       const allCategories = categoriesResponse.documents || [];
       const firstCategories = allCategories.slice(0, 4);
       setCategories(firstCategories as any);
 
-      // Group products by category
       const prodsByCat: Record<string, Product[]> = {};
       firstCategories.forEach((cat: any) => {
         const categoryProducts = allProducts.filter(
@@ -127,11 +127,9 @@ export default function LandingPage() {
       });
       setProductsByCategory(prodsByCat);
 
-      // Load FAQs
       const faqsList = await api.faq.list(businessId);
       setFaqs(faqsList);
 
-      // Load brands
       const brandsList = await api.brands.list(businessId);
       setBrands(brandsList);
     } catch (error) {
@@ -148,12 +146,10 @@ export default function LandingPage() {
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí puedes agregar la lógica para suscribir al newsletter
     console.log("Newsletter subscription:", email);
     setEmail("");
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -169,19 +165,55 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background">
       <LandingNavbar />
 
-      {/* Hero Section */}
+      {/* Hero Section con Parallax */}
       <section className="relative h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden">
-        {/* Background with Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70 z-10" />
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-60"
-          style={{ backgroundImage: "url('/hero-bg.jpg')" }}
-        />
+        {/* Animated Background */}
+        <motion.div
+          className="absolute inset-0 z-0"
+          style={{ y: heroY }}
+        >
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: "url('/hero-bg.png')" }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70" />
+        </motion.div>
+
+        {/* Floating shapes animation */}
+        <div className="absolute inset-0 overflow-hidden z-[5]">
+          <motion.div
+            className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl"
+            animate={{
+              x: [0, 100, 0],
+              y: [0, 50, 0],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute bottom-20 right-10 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+            animate={{
+              x: [0, -100, 0],
+              y: [0, -50, 0],
+            }}
+            transition={{
+              duration: 25,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
 
         {/* Content */}
-        <div className="relative z-20 max-w-7xl mx-auto px-4 md:px-8 text-center text-white">
+        <motion.div
+          className="relative z-20 max-w-7xl mx-auto px-4 md:px-8 text-center text-white"
+          style={{ opacity: heroOpacity }}
+        >
           <motion.h1
-            className="text-4xl md:text-6xl font-bold mb-6 text-primary"
+            className="text-4xl md:text-6xl font-bold mb-6"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -189,7 +221,7 @@ export default function LandingPage() {
             {config.hero.title}
           </motion.h1>
           <motion.p
-            className="text-lg md:text-xl mb-8 max-w-2xl mx-auto opacity-90 text-secondary"
+            className="text-lg md:text-xl mb-8 max-w-2xl mx-auto opacity-90"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -211,39 +243,58 @@ export default function LandingPage() {
               </Button>
             </Link>
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* Features Section - ✅ Fondo alternado */}
-      <section className="py-20 bg-secondary/5" id="features">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
+      {/* Features Section - Fondo con imagen sutil */}
+      <section className="relative py-20 overflow-hidden" id="features">
+        {/* Background pattern */}
+        <div className="absolute inset-0 bg-secondary/5">
+          <div
+            className="absolute inset-0 opacity-5"
+            style={{
+              backgroundImage: "url('/bg2.png')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundAttachment: "fixed"
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground text-primary">
+            <motion.h2
+              className="text-3xl md:text-4xl font-bold mb-4 text-primary"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
               ¿Por Qué Elegirnos?
-            </h2>
-            <p className="text-muted-foreground text-secondary">
+            </motion.h2>
+            <p className="text-muted-foreground text-primary">
               Comprometidos con la excelencia en cada detalle
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-primary">
+          <div className="text-primary grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {config.features.map((feature, index) => {
               const Icon = getIcon(feature.icon);
               return (
                 <motion.div
                   key={index}
-                  className="bg-card p-6 rounded-xl shadow-sm hover:shadow-lg transition-all border hover:border-primary/50"
+                  className="bg-card/80 backdrop-blur-sm p-6 rounded-xl shadow-sm hover:shadow-lg transition-all border hover:border-primary/50"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -5 }}
                 >
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
                     <Icon className="text-primary" size={28} />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 text-center text-foreground text-secondary">
+                  <h3 className="text-lg font-semibold mb-2 text-center">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground text-center text-sm text-secondary">
+                  <p className="text-muted-foreground text-center text-sm">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -253,44 +304,92 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* About Section - ✅ Fondo background normal */}
-      <section id="about" className="py-20 px-4 bg-background">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* About Section - Con imagen de fondo y overlay */}
+      <section id="about" className="text-primary relative py-20 px-4 overflow-hidden">
+        {/* Background image with parallax */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-fixed"
+          style={{
+            backgroundImage: "url('/bg3.png')",
+          }}
+        />
+        <div className="absolute inset-0 bg-background/95 backdrop-blur-sm" />
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-bold mb-6 text-foreground text-primary">{config.about.title}</h2>
-            <p className="text-lg mb-8 text-muted-foreground text-primary">
+            <h2 className="text-4xl font-bold mb-6">{config.about.title}</h2>
+            <p className="text-lg mb-8 text-muted-foreground">
               {config.about.description}
             </p>
-            <div className="grid md:grid-cols-2 gap-6 mt-8">
+            <div className="text-primarygrid md:grid-cols-2 gap-6 mt-8">
               {config.about.mission && (
-                <div className="bg-card p-6 rounded-lg border hover:shadow-md transition-shadow">
-                  <h3 className="font-semibold text-primary mb-2 text-lg text-secondary">Misión</h3>
-                  <p className="text-foreground">{config.about.mission}</p>
-                </div>
+                <motion.div
+                  className="bg-card/80 backdrop-blur-sm p-6 rounded-lg border hover:shadow-md transition-shadow"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <h3 className="font-semibold text-primary mb-2 text-lg">Misión</h3>
+                  <p className=" text-primary text-foreground">{config.about.mission}</p>
+                </motion.div>
               )}
               {config.about.vision && (
-                <div className="bg-card p-6 rounded-lg border hover:shadow-md transition-shadow">
-                  <h3 className="font-semibold text-primary mb-2 text-lg text-secondary">Visión</h3>
-                  <p className="text-foreground">{config.about.vision}</p>
-                </div>
+                <motion.div
+                  className="bg-card/80 backdrop-blur-sm p-6 rounded-lg border hover:shadow-md transition-shadow"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <h3 className="font-semibold text-primary mb-2 text-lg">Visión</h3>
+                  <p className="text-primary text-foreground">{config.about.vision}</p>
+                </motion.div>
               )}
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Categories Catalog Section - ✅ Fondo alternado */}
-      <section className="py-20 bg-secondary/5" id="catalog">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
+      {/* Categories Catalog Section - Fondo limpio con patrón sutil */}
+      <section className="relative py-20 bg-secondary/5" id="catalog">
+        {/* Animated gradient orbs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"
+            animate={{
+              scale: [1.2, 1, 1.2],
+              opacity: [0.5, 0.3, 0.5],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground text-primary">
+            <motion.h2
+              className="text-3xl md:text-4xl font-bold mb-4 text-primary"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
               Explora Nuestras Categorías
-            </h2>
-            <p className="text-muted-foreground text-secondary">
+            </motion.h2>
+            <p className="text-muted-foreground text-primary">
               Encuentra lo que necesitas organizado por categorías
             </p>
           </div>
@@ -346,25 +445,40 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Brands Section - ✅ Fondo background normal */}
+      {/* Brands Section - Con imagen de fondo */}
       {brands.length > 0 && (
-        <section id="brands" className="py-16 px-4 overflow-hidden bg-background">
-          <div className="max-w-6xl mx-auto">
+        <section id="brands" className="text-primary relative py-16 px-4 overflow-hidden">
+          {/* Background */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-fixed opacity-10"
+            style={{
+              backgroundImage: "url('/bg2.png')",
+            }}
+          />
+          <div className="absolute inset-0 bg-background/90" />
+
+          <div className="relative z-10 max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4 text-foreground text-primary">{config.brands.title}</h2>
+              <motion.h2
+                className="text-3xl font-bold mb-4"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                {config.brands.title}
+              </motion.h2>
               {config.brands.subtitle && (
-                <p className="text-muted-foreground text-secondary">{config.brands.subtitle}</p>
+                <p className="text-muted-foreground">{config.brands.subtitle}</p>
               )}
             </div>
 
             {/* Animated Marquee */}
             <div className="relative">
               <div className="flex gap-12 animate-marquee">
-                {/* First set of brands */}
                 {brands.map((brand) => (
                   <div
                     key={brand.$id}
-                    className="flex-shrink-0 flex items-center justify-center p-6 rounded-lg transition-all hover:scale-110 bg-card border"
+                    className="flex-shrink-0 flex items-center justify-center p-6 rounded-lg transition-all hover:scale-110 bg-card/50 backdrop-blur-sm border"
                   >
                     {brand.url ? (
                       <a href={brand.url} target="_blank" rel="noopener noreferrer">
@@ -383,12 +497,10 @@ export default function LandingPage() {
                     )}
                   </div>
                 ))}
-
-                {/* Duplicate for seamless loop */}
                 {brands.map((brand) => (
                   <div
                     key={`${brand.$id}-duplicate`}
-                    className="flex-shrink-0 flex items-center justify-center p-6 rounded-lg transition-all hover:scale-110 bg-card border"
+                    className="flex-shrink-0 flex items-center justify-center p-6 rounded-lg transition-all hover:scale-110 bg-card/50 backdrop-blur-sm border"
                   >
                     {brand.url ? (
                       <a href={brand.url} target="_blank" rel="noopener noreferrer">
@@ -413,7 +525,6 @@ export default function LandingPage() {
         </section>
       )}
 
-      {/* CSS animation */}
       <style jsx>{`
         @keyframes marquee {
           0% {
@@ -433,32 +544,43 @@ export default function LandingPage() {
         }
       `}</style>
 
-      {/* FAQ Section - ✅ Fondo alternado */}
+      {/* FAQ Section - Con gradiente animado */}
       {faqs.length > 0 && (
-        <section id="faq" className="py-20 px-4 bg-secondary/5">
-          <div className="max-w-3xl mx-auto">
+        <section id="faq" className="relative py-20 px-4 overflow-hidden">
+          {/* Animated background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 via-background to-primary/10" />
+
+          <div className="relative z-10 max-w-3xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4 text-foreground text-primary">{config.faq.title}</h2>
+              <motion.h2
+                className="text-primary text-4xl font-bold mb-4"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                {config.faq.title}
+              </motion.h2>
               {config.faq.subtitle && (
-                <p className="text-lg text-muted-foreground text-secondary">{config.faq.subtitle}</p>
+                <p className=" text-primary text-lg text-muted-foreground">{config.faq.subtitle}</p>
               )}
             </div>
             <div className="space-y-4">
-              {faqs.map((faq) => (
+              {faqs.map((faq, index) => (
                 <motion.div
                   key={faq.$id}
-                  className="rounded-lg overflow-hidden bg-card border"
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  className="rounded-lg overflow-hidden bg-card/80 backdrop-blur-sm border"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
                 >
                   <button
                     onClick={() => setOpenFaq(openFaq === faq.$id ? null : faq.$id)}
                     className="w-full p-4 text-left flex justify-between items-center hover:bg-accent/50 transition-colors"
                   >
-                    <span className="font-semibold pr-4 text-foreground">{faq.question}</span>
+                    <span className="font-semibold pr-4">{faq.question}</span>
                     <ChevronDown
-                      className={`w-5 h-5 flex-shrink-0 transition-transform text-foreground ${openFaq === faq.$id ? 'rotate-180' : ''
+                      className={`w-5 h-5 flex-shrink-0 transition-transform ${openFaq === faq.$id ? 'rotate-180' : ''
                         }`}
                     />
                   </button>
@@ -471,7 +593,7 @@ export default function LandingPage() {
                       className="border-t"
                     >
                       <div className="p-4">
-                        <p className="text-foreground leading-relaxed">{faq.answer}</p>
+                        <p className="leading-relaxed">{faq.answer}</p>
                       </div>
                     </motion.div>
                   )}
@@ -482,9 +604,39 @@ export default function LandingPage() {
         </section>
       )}
 
-      {/* CTA Section */}
+      {/* CTA Section - Con imagen de fondo dramática */}
       <section className="relative py-32 px-4 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0" />
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('/bg3.png')",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/95 to-primary/85" />
+
+        {/* Animated particles */}
+        <div className="absolute inset-0">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-white/20 rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [-20, 20, -20],
+                opacity: [0.2, 0.5, 0.2],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </div>
+
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -513,7 +665,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="bg-card border-t">
         {/* Mini features */}
-        <div className="border-b">
+        <div className="text-primary border-b">
           <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="flex items-center gap-3">
@@ -521,8 +673,8 @@ export default function LandingPage() {
                   <Truck className="text-primary" size={24} />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground text-primary  ">Envíos a Nivel Nacional</p>
-                  <p className="text-sm text-muted-foreground text-primary ">
+                  <p className="text-primary font-semibold">Envíos a Nivel Nacional</p>
+                  <p className="text-primary text-sm text-muted-foreground">
                     Despachamos a toda Colombia
                   </p>
                 </div>
@@ -532,8 +684,8 @@ export default function LandingPage() {
                   <MapPin className="text-primary" size={24} />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground text-primary ">Ubicación en Bogotá</p>
-                  <p className="text-sm text-muted-foreground text-primary ">
+                  <p className="text-primary font-semibold">Ubicación en Bogotá</p>
+                  <p className="text-primary text-sm text-muted-foreground">
                     Distribución desde Bogotá
                   </p>
                 </div>
@@ -543,8 +695,8 @@ export default function LandingPage() {
                   <Star className="text-primary" size={24} />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground text-primary">Compra Segura en Línea</p>
-                  <p className="text-sm text-muted-foreground text-primary">
+                  <p className="text-primary font-semibold">Compra Segura en Línea</p>
+                  <p className="text-primary text-sm text-muted-foreground">
                     Transacciones protegidas
                   </p>
                 </div>
@@ -554,8 +706,8 @@ export default function LandingPage() {
                   <MessageCircle className="text-primary" size={24} />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground text-primary">Asesoría y Cumplimiento</p>
-                  <p className="text-sm text-muted-foreground text-primary">
+                  <p className="text-primary font-semibold">Asesoría y Cumplimiento</p>
+                  <p className="text-primary text-sm text-muted-foreground">
                     Calidad y soporte garantizado
                   </p>
                 </div>
@@ -572,7 +724,7 @@ export default function LandingPage() {
               <h3 className="font-bold text-lg mb-4 text-primary">
                 Nosotros
               </h3>
-              <p className="text-sm text-muted-foreground mb-4 text-primary ">
+              <p className="text-primary text-sm text-muted-foreground mb-4">
                 {config.footer.description}
               </p>
               <div className="flex gap-3">
@@ -609,7 +761,7 @@ export default function LandingPage() {
                 <li>
                   <Link
                     href="/"
-                    className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
+                    className="text-primary text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
                   >
                     <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                     Inicio
@@ -618,27 +770,27 @@ export default function LandingPage() {
                 <li>
                   <Link
                     href="/shop"
-                    className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
+                    className="text-primary text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
                   >
-                    <ChevronRight size={16} className="text-primary group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                     Catálogo
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/#about"
-                    className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
+                    className="text-primary text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
                   >
-                    <ChevronRight size={16} className="text-primary  group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                     Nosotros
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/#faq"
-                    className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
+                    className=" text-primary text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
                   >
-                    <ChevronRight size={16} className="text-primary group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                     Preguntas Frecuentes
                   </Link>
                 </li>
@@ -655,7 +807,7 @@ export default function LandingPage() {
                   <li key={cat.$id}>
                     <Link
                       href={`/shop?category=${cat.slug}`}
-                      className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
+                      className="text-primary text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
                     >
                       <ChevronRight size={16} className="text-primary group-hover:translate-x-1 transition-transform" />
                       {cat.name}
@@ -670,7 +822,7 @@ export default function LandingPage() {
               <h3 className="font-bold text-lg mb-4 text-primary">
                 Suscríbete
               </h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-primary text-sm text-muted-foreground mb-4">
                 Déjanos tu correo y recibe información valiosa junto con las ofertas que tenemos
               </p>
               <form onSubmit={handleNewsletterSubmit} className="space-y-3">
@@ -681,7 +833,7 @@ export default function LandingPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="tu@email.com"
                     required
-                    className="flex-1 px-3 py-2 rounded-lg bg-background border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
+                    className="text-primary flex-1 px-3 py-2 rounded-lg bg-background border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
                   />
                   <Button
                     type="submit"
@@ -694,13 +846,13 @@ export default function LandingPage() {
                 <div className="flex items-start gap-2">
                   <input
                     type="checkbox"
-                    id="newsletter-accept"
-                    className="mt-1 rounded"
+                    id=" newsletter-accept"
+                    className=" mt-1 rounded"
                     required
                   />
                   <label
                     htmlFor="newsletter-accept"
-                    className="text-xs text-muted-foreground"
+                    className="text-primary text-xs text-muted-foreground"
                   >
                     Acepto recibir correos con ofertas y novedades
                   </label>
@@ -711,9 +863,9 @@ export default function LandingPage() {
         </div>
 
         {/* Copyright */}
-        <div className="border-t">
+        <div className="text-primary border-t">
           <div className="max-w-7xl mx-auto px-4 md:px-8 py-6">
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="text-primary text-center text-sm text-muted-foreground">
               {config.footer.copyright}
             </p>
           </div>
