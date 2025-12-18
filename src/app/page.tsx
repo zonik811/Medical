@@ -174,7 +174,7 @@ export default function LandingPage() {
         {/* Background with Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70 z-10" />
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-70"
+          className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{ backgroundImage: "url('/hero-bg.jpg')" }}
         />
 
@@ -214,11 +214,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-muted/30" id="features">
+      {/* Features Section - ✅ Fondo alternado */}
+      <section className="py-20 bg-secondary/5" id="features">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
               ¿Por Qué Elegirnos?
             </h2>
             <p className="text-muted-foreground">
@@ -231,7 +231,7 @@ export default function LandingPage() {
               return (
                 <motion.div
                   key={index}
-                  className="bg-card p-6 rounded-xl shadow-sm hover:shadow-md transition-all border border-border/50 hover:border-primary/50"
+                  className="bg-card p-6 rounded-xl shadow-sm hover:shadow-lg transition-all border hover:border-primary/50"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -253,29 +253,29 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-20 px-4 bg-muted/10">
+      {/* About Section - ✅ Fondo background normal */}
+      <section id="about" className="py-20 px-4 bg-background">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-bold mb-6">{config.about.title}</h2>
-            <p className="text-lg mb-6 text-muted-foreground">
+            <h2 className="text-4xl font-bold mb-6 text-foreground">{config.about.title}</h2>
+            <p className="text-lg mb-8 text-muted-foreground">
               {config.about.description}
             </p>
             <div className="grid md:grid-cols-2 gap-6 mt-8">
               {config.about.mission && (
-                <div className="bg-card p-6 rounded-lg border">
-                  <h3 className="font-semibold text-primary mb-2">Misión</h3>
-                  <p className="text-muted-foreground">{config.about.mission}</p>
+                <div className="bg-card p-6 rounded-lg border hover:shadow-md transition-shadow">
+                  <h3 className="font-semibold text-primary mb-2 text-lg">Misión</h3>
+                  <p className="text-foreground">{config.about.mission}</p>
                 </div>
               )}
               {config.about.vision && (
-                <div className="bg-card p-6 rounded-lg border">
-                  <h3 className="font-semibold text-primary mb-2">Visión</h3>
-                  <p className="text-muted-foreground">{config.about.vision}</p>
+                <div className="bg-card p-6 rounded-lg border hover:shadow-md transition-shadow">
+                  <h3 className="font-semibold text-primary mb-2 text-lg">Visión</h3>
+                  <p className="text-foreground">{config.about.vision}</p>
                 </div>
               )}
             </div>
@@ -283,11 +283,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Categories Catalog Section */}
-      <section className="py-20" id="catalog">
+      {/* Categories Catalog Section - ✅ Fondo alternado */}
+      <section className="py-20 bg-secondary/5" id="catalog">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
               Explora Nuestras Categorías
             </h2>
             <p className="text-muted-foreground">
@@ -310,7 +310,7 @@ export default function LandingPage() {
                       {category.name}
                     </h3>
                     {category.description && (
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground max-w-md">
                         {category.description}
                       </p>
                     )}
@@ -346,12 +346,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Brands Section */}
+      {/* Brands Section - ✅ Fondo background normal */}
       {brands.length > 0 && (
-        <section id="brands" className="py-16 px-4 overflow-hidden bg-muted/10">
+        <section id="brands" className="py-16 px-4 overflow-hidden bg-background">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">{config.brands.title}</h2>
+              <h2 className="text-3xl font-bold mb-4 text-foreground">{config.brands.title}</h2>
               {config.brands.subtitle && (
                 <p className="text-muted-foreground">{config.brands.subtitle}</p>
               )}
@@ -433,12 +433,12 @@ export default function LandingPage() {
         }
       `}</style>
 
-      {/* FAQ Section */}
+      {/* FAQ Section - ✅ Fondo alternado */}
       {faqs.length > 0 && (
-        <section id="faq" className="py-20 px-4">
+        <section id="faq" className="py-20 px-4 bg-secondary/5">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">{config.faq.title}</h2>
+              <h2 className="text-4xl font-bold mb-4 text-foreground">{config.faq.title}</h2>
               {config.faq.subtitle && (
                 <p className="text-lg text-muted-foreground">{config.faq.subtitle}</p>
               )}
@@ -454,11 +454,11 @@ export default function LandingPage() {
                 >
                   <button
                     onClick={() => setOpenFaq(openFaq === faq.$id ? null : faq.$id)}
-                    className="w-full p-4 text-left flex justify-between items-center hover:bg-muted/50 transition-colors"
+                    className="w-full p-4 text-left flex justify-between items-center hover:bg-accent/50 transition-colors"
                   >
-                    <span className="font-semibold pr-4">{faq.question}</span>
+                    <span className="font-semibold pr-4 text-foreground">{faq.question}</span>
                     <ChevronDown
-                      className={`w-5 h-5 flex-shrink-0 transition-transform ${openFaq === faq.$id ? 'rotate-180' : ''
+                      className={`w-5 h-5 flex-shrink-0 transition-transform text-foreground ${openFaq === faq.$id ? 'rotate-180' : ''
                         }`}
                     />
                   </button>
@@ -471,7 +471,7 @@ export default function LandingPage() {
                       className="border-t"
                     >
                       <div className="p-4">
-                        <p className="text-muted-foreground">{faq.answer}</p>
+                        <p className="text-foreground leading-relaxed">{faq.answer}</p>
                       </div>
                     </motion.div>
                   )}
@@ -521,7 +521,7 @@ export default function LandingPage() {
                   <Truck className="text-primary" size={24} />
                 </div>
                 <div>
-                  <p className="font-semibold">Envíos a Nivel Nacional</p>
+                  <p className="font-semibold text-foreground">Envíos a Nivel Nacional</p>
                   <p className="text-sm text-muted-foreground">
                     Despachamos a toda Colombia
                   </p>
@@ -532,7 +532,7 @@ export default function LandingPage() {
                   <MapPin className="text-primary" size={24} />
                 </div>
                 <div>
-                  <p className="font-semibold">Ubicación en Bogotá</p>
+                  <p className="font-semibold text-foreground">Ubicación en Bogotá</p>
                   <p className="text-sm text-muted-foreground">
                     Distribución desde Bogotá
                   </p>
@@ -543,7 +543,7 @@ export default function LandingPage() {
                   <Star className="text-primary" size={24} />
                 </div>
                 <div>
-                  <p className="font-semibold">Compra Segura en Línea</p>
+                  <p className="font-semibold text-foreground">Compra Segura en Línea</p>
                   <p className="text-sm text-muted-foreground">
                     Transacciones protegidas
                   </p>
@@ -554,7 +554,7 @@ export default function LandingPage() {
                   <MessageCircle className="text-primary" size={24} />
                 </div>
                 <div>
-                  <p className="font-semibold">Asesoría y Cumplimiento</p>
+                  <p className="font-semibold text-foreground">Asesoría y Cumplimiento</p>
                   <p className="text-sm text-muted-foreground">
                     Calidad y soporte garantizado
                   </p>
@@ -681,7 +681,7 @@ export default function LandingPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="tu@email.com"
                     required
-                    className="flex-1 px-3 py-2 rounded-lg bg-muted border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="flex-1 px-3 py-2 rounded-lg bg-background border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
                   />
                   <Button
                     type="submit"
