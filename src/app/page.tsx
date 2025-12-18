@@ -2,12 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { api } from "@/services/api";
 import { Product, LandingConfig, FAQ, Brand } from "@/types";
-import { ArrowRight, Truck, Star, MessageCircle, DollarSign, ChevronDown, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Send } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowRight,
+  Truck,
+  Star,
+  MessageCircle,
+  DollarSign,
+  ChevronDown,
+  ChevronRight,
+  MapPin,
+  Send,
+  Loader2
+} from "lucide-react";
+import { motion } from "framer-motion";
 import { LandingNavbar } from "@/components/landing/landing-navbar";
 import { ProductCard } from "@/components/shop/product-card";
 import { useCartStore } from "@/lib/store/cart-store";
@@ -59,28 +69,6 @@ const DEFAULT_CONFIG: LandingConfig['config'] = {
   }
 };
 
-// Sample testimonials (hardcoded for now)
-const TESTIMONIALS = [
-  {
-    name: "María González",
-    position: "Cliente Satisfecho",
-    content: "Excelente servicio y productos de alta calidad. La entrega fue rápida y todo llegó en perfectas condiciones. Muy recomendado.",
-    rating: 5
-  },
-  {
-    name: "Carlos Rodríguez",
-    position: "Empresa ABC",
-    content: "Llevamos años trabajando con ellos y siempre nos brindan el mejor soporte. Los productos son exactamente lo que necesitamos.",
-    rating: 5
-  },
-  {
-    name: "Ana Martínez",
-    position: "Consultorio Médico",
-    content: "Profesionales y confiables. Los productos llegaron a tiempo y la asesoría personalizada fue excelente.",
-    rating: 5
-  }
-];
-
 interface Category {
   $id: string;
   name: string;
@@ -89,7 +77,7 @@ interface Category {
 }
 
 export default function LandingPage() {
-  // ✅ Estados corregidos y completos
+  // Estados
   const [config, setConfig] = useState<LandingConfig['config']>(DEFAULT_CONFIG);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -98,19 +86,19 @@ export default function LandingPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [businessId] = useState(process.env.NEXT_PUBLIC_BUSINESS_ID || "");
   const [openFaq, setOpenFaq] = useState<string | null>(null);
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [email, setEmail] = useState("");
 
-  // ✅ Importar addItem del store
   const { addItem } = useCartStore();
 
-  // ✅ useEffect para cargar datos
   useEffect(() => {
     loadLandingData();
   }, []);
 
-  // ✅ Función para cargar datos de la API
   const loadLandingData = async () => {
     try {
+      setIsLoading(true);
+
       // Load config
       const landingConfig = await api.landingConfig.get(businessId);
       if (landingConfig) {
@@ -148,15 +136,9 @@ export default function LandingPage() {
       setBrands(brandsList);
     } catch (error) {
       console.error("Error loading landing data:", error);
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const nextTestimonial = () => {
-    setCurrentTestimonial((prev) => (prev + 1) % TESTIMONIALS.length);
-  };
-
-  const prevTestimonial = () => {
-    setCurrentTestimonial((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
   };
 
   const getIcon = (iconName: string) => {
@@ -164,16 +146,35 @@ export default function LandingPage() {
     return icons[iconName] || Star;
   };
 
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Aquí puedes agregar la lógica para suscribir al newsletter
+    console.log("Newsletter subscription:", email);
+    setEmail("");
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Cargando catálogo...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
+    <div className="min-h-screen bg-background">
       <LandingNavbar />
 
-      {/* Hero Section with Background */}
+      {/* Hero Section */}
       <section className="relative h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden">
-        {/* Background Image with Overlay */}
+        {/* Background with Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70 z-10" />
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-30"
+          className="absolute inset-0 bg-cover bg-center opacity-70"
           style={{ backgroundImage: "url('/hero-bg.jpg')" }}
         />
 
@@ -201,7 +202,10 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             <Link href="/shop">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold px-8">
+              <Button
+                size="lg"
+                className="bg-white text-primary hover:bg-white/90 font-semibold px-8 shadow-lg hover:shadow-xl transition-all"
+              >
                 {config.hero.buttonText}
                 <ArrowRight className="ml-2" size={20} />
               </Button>
@@ -217,6 +221,9 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               ¿Por Qué Elegirnos?
             </h2>
+            <p className="text-muted-foreground">
+              Comprometidos con la excelencia en cada detalle
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {config.features.map((feature, index) => {
@@ -224,7 +231,7 @@ export default function LandingPage() {
               return (
                 <motion.div
                   key={index}
-                  className="bg-card p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                  className="bg-card p-6 rounded-xl shadow-sm hover:shadow-md transition-all border border-border/50 hover:border-primary/50"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -233,7 +240,7 @@ export default function LandingPage() {
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
                     <Icon className="text-primary" size={28} />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 text-center text-primary">
+                  <h3 className="text-lg font-semibold mb-2 text-center text-foreground">
                     {feature.title}
                   </h3>
                   <p className="text-muted-foreground text-center text-sm">
@@ -246,17 +253,33 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* About */}
-      <section id="about" className="py-20 px-4" style={{ background: 'var(--surface)' }}>
+      {/* About Section */}
+      <section id="about" className="py-20 px-4 bg-muted/10">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">{config.about.title}</h2>
-          <p className="text-lg mb-6" style={{ color: 'var(--muted)' }}>{config.about.description}</p>
-          {config.about.mission && (
-            <p className="text-base mb-2"><strong>Misión:</strong> {config.about.mission}</p>
-          )}
-          {config.about.vision && (
-            <p className="text-base"><strong>Visión:</strong> {config.about.vision}</p>
-          )}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl font-bold mb-6">{config.about.title}</h2>
+            <p className="text-lg mb-6 text-muted-foreground">
+              {config.about.description}
+            </p>
+            <div className="grid md:grid-cols-2 gap-6 mt-8">
+              {config.about.mission && (
+                <div className="bg-card p-6 rounded-lg border">
+                  <h3 className="font-semibold text-primary mb-2">Misión</h3>
+                  <p className="text-muted-foreground">{config.about.mission}</p>
+                </div>
+              )}
+              {config.about.vision && (
+                <div className="bg-card p-6 rounded-lg border">
+                  <h3 className="font-semibold text-primary mb-2">Visión</h3>
+                  <p className="text-muted-foreground">{config.about.vision}</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -272,34 +295,49 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="space-y-16">
-            {categories.map((category, catIndex) => (
-              <motion.div
-                key={category.$id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: catIndex * 0.1 }}
-              >
-                <h3 className="text-2xl font-bold mb-6 text-primary">
-                  {category.name}
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {productsByCategory[category.$id]?.map((product) => (
-                    <ProductCard
-                      key={product.$id}
-                      product={product}
-                      onAddToCart={() => addItem(product)}
-                    />
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          {categories.length > 0 ? (
+            <div className="space-y-16">
+              {categories.map((category, catIndex) => (
+                <motion.div
+                  key={category.$id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: catIndex * 0.1 }}
+                >
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-2xl font-bold text-primary">
+                      {category.name}
+                    </h3>
+                    {category.description && (
+                      <p className="text-sm text-muted-foreground">
+                        {category.description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {productsByCategory[category.$id]?.map((product) => (
+                      <ProductCard
+                        key={product.$id}
+                        product={product}
+                        onAddToCart={() => addItem(product)}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                No hay productos disponibles en este momento
+              </p>
+            </div>
+          )}
 
           <div className="text-center mt-12">
             <Link href="/shop">
-              <Button size="lg" className="px-8">
+              <Button size="lg" className="px-8 shadow-lg hover:shadow-xl transition-all">
                 Ver Todo el Catálogo
                 <ArrowRight className="ml-2" size={20} />
               </Button>
@@ -308,14 +346,16 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Brands - Animated Carousel */}
+      {/* Brands Section */}
       {brands.length > 0 && (
-        <section id="brands" className="py-16 px-4 overflow-hidden" style={{ background: 'var(--surface)' }}>
+        <section id="brands" className="py-16 px-4 overflow-hidden bg-muted/10">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold mb-12 text-center">{config.brands.title}</h2>
-            {config.brands.subtitle && (
-              <p className="text-center mb-8" style={{ color: 'var(--muted)' }}>{config.brands.subtitle}</p>
-            )}
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">{config.brands.title}</h2>
+              {config.brands.subtitle && (
+                <p className="text-muted-foreground">{config.brands.subtitle}</p>
+              )}
+            </div>
 
             {/* Animated Marquee */}
             <div className="relative">
@@ -324,8 +364,7 @@ export default function LandingPage() {
                 {brands.map((brand) => (
                   <div
                     key={brand.$id}
-                    className="flex-shrink-0 flex items-center justify-center p-6 rounded-lg transition-all hover:scale-110"
-                    style={{ background: 'var(--background)' }}
+                    className="flex-shrink-0 flex items-center justify-center p-6 rounded-lg transition-all hover:scale-110 bg-card border"
                   >
                     {brand.url ? (
                       <a href={brand.url} target="_blank" rel="noopener noreferrer">
@@ -349,8 +388,7 @@ export default function LandingPage() {
                 {brands.map((brand) => (
                   <div
                     key={`${brand.$id}-duplicate`}
-                    className="flex-shrink-0 flex items-center justify-center p-6 rounded-lg transition-all hover:scale-110"
-                    style={{ background: 'var(--background)' }}
+                    className="flex-shrink-0 flex items-center justify-center p-6 rounded-lg transition-all hover:scale-110 bg-card border"
                   >
                     {brand.url ? (
                       <a href={brand.url} target="_blank" rel="noopener noreferrer">
@@ -375,7 +413,7 @@ export default function LandingPage() {
         </section>
       )}
 
-      {/* Add CSS animation */}
+      {/* CSS animation */}
       <style jsx>{`
         @keyframes marquee {
           0% {
@@ -395,51 +433,80 @@ export default function LandingPage() {
         }
       `}</style>
 
-      {/* FAQ */}
+      {/* FAQ Section */}
       {faqs.length > 0 && (
         <section id="faq" className="py-20 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold mb-4">{config.faq.title}</h2>
               {config.faq.subtitle && (
-                <p className="text-lg" style={{ color: 'var(--muted)' }}>{config.faq.subtitle}</p>
+                <p className="text-lg text-muted-foreground">{config.faq.subtitle}</p>
               )}
             </div>
             <div className="space-y-4">
               {faqs.map((faq) => (
-                <div key={faq.$id} className="rounded-lg overflow-hidden" style={{ background: 'var(--surface)' }}>
+                <motion.div
+                  key={faq.$id}
+                  className="rounded-lg overflow-hidden bg-card border"
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
                   <button
                     onClick={() => setOpenFaq(openFaq === faq.$id ? null : faq.$id)}
-                    className="w-full p-4 text-left flex justify-between items-center hover:opacity-80"
+                    className="w-full p-4 text-left flex justify-between items-center hover:bg-muted/50 transition-colors"
                   >
-                    <span className="font-semibold">{faq.question}</span>
-                    <ChevronDown className={`w-5 h-5 transition-transform ${openFaq === faq.$id ? 'rotate-180' : ''}`} />
+                    <span className="font-semibold pr-4">{faq.question}</span>
+                    <ChevronDown
+                      className={`w-5 h-5 flex-shrink-0 transition-transform ${openFaq === faq.$id ? 'rotate-180' : ''
+                        }`}
+                    />
                   </button>
                   {openFaq === faq.$id && (
-                    <div className="p-4 pt-0">
-                      <p style={{ color: 'var(--muted)' }}>{faq.answer}</p>
-                    </div>
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="border-t"
+                    >
+                      <div className="p-4">
+                        <p className="text-muted-foreground">{faq.answer}</p>
+                      </div>
+                    </motion.div>
                   )}
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
         </section>
       )}
 
-      {/* CTA Final */}
-      <section className="py-32 px-4 text-white" style={{
-        background: 'linear-gradient(135deg, var(--primary), var(--secondary))'
-      }}>
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl font-black mb-6">{config.cta.title}</h2>
-          <p className="text-xl mb-8">{config.cta.subtitle}</p>
-          <Link href="/shop">
-            <Button size="lg" className="text-lg px-12 h-16 bg-white hover:bg-white/90" style={{ color: 'var(--primary)' }}>
-              {config.cta.buttonText}
-              <ArrowRight className="ml-2 w-6 h-6" />
-            </Button>
-          </Link>
+      {/* CTA Section */}
+      <section className="relative py-32 px-4 text-white overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0" />
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl font-black mb-6">
+              {config.cta.title}
+            </h2>
+            <p className="text-xl mb-8 opacity-90">
+              {config.cta.subtitle}
+            </p>
+            <Link href="/shop">
+              <Button
+                size="lg"
+                className="text-lg px-12 h-16 bg-white text-primary hover:bg-white/90 shadow-xl hover:shadow-2xl transition-all"
+              >
+                {config.cta.buttonText}
+                <ArrowRight className="ml-2 w-6 h-6" />
+              </Button>
+            </Link>
+          </motion.div>
         </div>
       </section>
 
@@ -448,33 +515,49 @@ export default function LandingPage() {
         {/* Mini features */}
         <div className="border-b">
           <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="flex items-center gap-3">
-                <Truck className="text-primary" size={32} />
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Truck className="text-primary" size={24} />
+                </div>
                 <div>
                   <p className="font-semibold">Envíos a Nivel Nacional</p>
-                  <p className="text-sm text-muted-foreground">Despachamos a toda Colombia.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Despachamos a toda Colombia
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <MapPin className="text-primary" size={32} />
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <MapPin className="text-primary" size={24} />
+                </div>
                 <div>
                   <p className="font-semibold">Ubicación en Bogotá</p>
-                  <p className="text-sm text-muted-foreground">Distribución desde Bogotá.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Distribución desde Bogotá
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Star className="text-primary" size={32} />
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Star className="text-primary" size={24} />
+                </div>
                 <div>
                   <p className="font-semibold">Compra Segura en Línea</p>
-                  <p className="text-sm text-muted-foreground">Transacciones protegidas.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Transacciones protegidas
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <MessageCircle className="text-primary" size={32} />
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <MessageCircle className="text-primary" size={24} />
+                </div>
                 <div>
                   <p className="font-semibold">Asesoría y Cumplimiento</p>
-                  <p className="text-sm text-muted-foreground">Calidad y soporte garantizado.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Calidad y soporte garantizado
+                  </p>
                 </div>
               </div>
             </div>
@@ -483,46 +566,99 @@ export default function LandingPage() {
 
         {/* Main footer content */}
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* About */}
             <div>
-              <h3 className="font-bold text-lg mb-4 text-primary border-b-2 border-primary pb-2 inline-block">Nosotros</h3>
-              <p className="text-sm text-muted-foreground mb-4 mt-4">
+              <h3 className="font-bold text-lg mb-4 text-primary">
+                Nosotros
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
                 {config.footer.description}
               </p>
               <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 bg-black rounded-full flex items-center justify-center hover:bg-black/80 transition-colors">
-                  <span className="text-white text-lg">f</span>
+                <a
+                  href="#"
+                  className="w-10 h-10 bg-primary/10 hover:bg-primary/20 rounded-full flex items-center justify-center transition-colors"
+                  aria-label="Facebook"
+                >
+                  <span className="text-primary text-lg font-bold">f</span>
                 </a>
-                <a href="#" className="w-10 h-10 bg-black rounded-full flex items-center justify-center hover:bg-black/80 transition-colors">
-                  <span className="text-white text-lg">in</span>
+                <a
+                  href="#"
+                  className="w-10 h-10 bg-primary/10 hover:bg-primary/20 rounded-full flex items-center justify-center transition-colors"
+                  aria-label="LinkedIn"
+                >
+                  <span className="text-primary text-lg font-bold">in</span>
                 </a>
-                <a href="#" className="w-10 h-10 bg-black rounded-full flex items-center justify-center hover:bg-black/80 transition-colors">
-                  <span className="text-white text-lg">W</span>
+                <a
+                  href="#"
+                  className="w-10 h-10 bg-primary/10 hover:bg-primary/20 rounded-full flex items-center justify-center transition-colors"
+                  aria-label="WhatsApp"
+                >
+                  <span className="text-primary text-lg font-bold">W</span>
                 </a>
               </div>
             </div>
 
             {/* Menu */}
             <div>
-              <h3 className="font-bold text-lg mb-4 text-primary border-b-2 border-primary pb-2 inline-block">Menú</h3>
-              <ul className="space-y-2 text-sm mt-4">
-                <li><Link href="/" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><ChevronRight size={16} />Inicio</Link></li>
-                <li><Link href="/shop" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><ChevronRight size={16} />Equipos</Link></li>
-                <li><Link href="/shop" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><ChevronRight size={16} />Insumos</Link></li>
-                <li><Link href="/shop" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><ChevronRight size={16} />Ropa</Link></li>
-                <li><Link href="/shop" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><ChevronRight size={16} />EPP</Link></li>
+              <h3 className="font-bold text-lg mb-4 text-primary">
+                Menú
+              </h3>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link
+                    href="/"
+                    className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
+                  >
+                    <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    Inicio
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/shop"
+                    className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
+                  >
+                    <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    Catálogo
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/#about"
+                    className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
+                  >
+                    <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    Nosotros
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/#faq"
+                    className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
+                  >
+                    <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    Preguntas Frecuentes
+                  </Link>
+                </li>
               </ul>
             </div>
 
             {/* Categories */}
             <div>
-              <h3 className="font-bold text-lg mb-4 text-primary border-b-2 border-primary pb-2 inline-block">Categorías</h3>
-              <ul className="space-y-2 text-sm mt-4">
+              <h3 className="font-bold text-lg mb-4 text-primary">
+                Categorías
+              </h3>
+              <ul className="space-y-2 text-sm">
                 {categories.slice(0, 5).map(cat => (
                   <li key={cat.$id}>
-                    <Link href="/shop" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
-                      <ChevronRight size={16} />{cat.name}
+                    <Link
+                      href={`/shop?category=${cat.slug}`}
+                      className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group"
+                    >
+                      <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                      {cat.name}
                     </Link>
                   </li>
                 ))}
@@ -531,26 +667,45 @@ export default function LandingPage() {
 
             {/* Newsletter */}
             <div>
-              <h3 className="font-bold text-lg mb-4 text-primary border-b-2 border-primary pb-2 inline-block">Suscríbete</h3>
-              <p className="text-sm text-muted-foreground mb-4 mt-4">
+              <h3 className="font-bold text-lg mb-4 text-primary">
+                Suscríbete
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
                 Déjanos tu correo y recibe información valiosa junto con las ofertas que tenemos
               </p>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Email"
-                  className="flex-1 px-3 py-2 rounded-lg bg-muted border border-border text-sm"
-                />
-                <Button size="icon" className="flex-shrink-0">
-                  <Send size={18} />
-                </Button>
-              </div>
-              <div className="mt-4 flex items-center gap-2">
-                <input type="checkbox" id="newsletter-accept" className="rounded" />
-                <label htmlFor="newsletter-accept" className="text-xs text-muted-foreground">
-                  Acepto recibir correos
-                </label>
-              </div>
+              <form onSubmit={handleNewsletterSubmit} className="space-y-3">
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="tu@email.com"
+                    required
+                    className="flex-1 px-3 py-2 rounded-lg bg-muted border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <Button
+                    type="submit"
+                    size="icon"
+                    className="flex-shrink-0"
+                  >
+                    <Send size={18} />
+                  </Button>
+                </div>
+                <div className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    id="newsletter-accept"
+                    className="mt-1 rounded"
+                    required
+                  />
+                  <label
+                    htmlFor="newsletter-accept"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Acepto recibir correos con ofertas y novedades
+                  </label>
+                </div>
+              </form>
             </div>
           </div>
         </div>
