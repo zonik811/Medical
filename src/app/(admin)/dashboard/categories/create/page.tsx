@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, HelpCircle } from "lucide-react";
 import { api } from "@/services/api";
 import { useBusinessStore } from "@/lib/store/business-store";
 import { toast } from "sonner";
 import Link from "next/link";
+import { createCategoryTour, startTour } from "@/lib/tours";
 
 export default function CreateCategoryPage() {
     const router = useRouter();
@@ -82,18 +83,28 @@ export default function CreateCategoryPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-4">
-                <Link href="/dashboard/categories">
-                    <Button variant="ghost" size="icon">
-                        <ArrowLeft className="w-4 h-4" />
-                    </Button>
-                </Link>
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Nueva Categoría</h2>
-                    <p className="text-muted-foreground">
-                        Crea una nueva categoría para organizar tus productos
-                    </p>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <Link href="/dashboard/categories">
+                        <Button variant="ghost" size="icon">
+                            <ArrowLeft className="w-4 h-4" />
+                        </Button>
+                    </Link>
+                    <div>
+                        <h2 className="text-3xl font-bold tracking-tight">Nueva Categoría</h2>
+                        <p className="text-muted-foreground">
+                            Crea una nueva categoría para organizar tus productos
+                        </p>
+                    </div>
                 </div>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => startTour(createCategoryTour)}
+                    title="Ver guía de creación"
+                >
+                    <HelpCircle className="h-5 w-5" />
+                </Button>
             </div>
 
             <form onSubmit={handleSubmit}>
@@ -102,7 +113,7 @@ export default function CreateCategoryPage() {
                         <CardTitle>Información de la Categoría</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        <div className="space-y-2">
+                        <div className="space-y-2" data-tour="category-name">
                             <Label htmlFor="name">
                                 Nombre <span className="text-red-500">*</span>
                             </Label>
@@ -118,7 +129,7 @@ export default function CreateCategoryPage() {
                             </p>
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-2" data-tour="category-slug">
                             <Label htmlFor="slug">
                                 Slug (URL) <span className="text-red-500">*</span>
                             </Label>
@@ -134,7 +145,7 @@ export default function CreateCategoryPage() {
                             </p>
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-2" data-tour="category-description">
                             <Label htmlFor="description">
                                 Descripción (opcional)
                             </Label>
@@ -155,6 +166,7 @@ export default function CreateCategoryPage() {
                                 type="submit"
                                 disabled={saving}
                                 className="flex-1"
+                                data-tour="submit-category"
                             >
                                 {saving ? (
                                     <>Guardando...</>

@@ -190,6 +190,45 @@ export const categoriesTour: DriveStep[] = [
     }
 ];
 
+export const createCategoryTour: DriveStep[] = [
+    {
+        element: "[data-tour='category-name']",
+        popover: {
+            title: "📝 Nombre de la Categoría",
+            description: "Ingresa el nombre de la categoría. Ejemplo: 'Electrónica', 'Ropa', 'Alimentos'. Será visible para los clientes.",
+            side: "right",
+            align: "start"
+        }
+    },
+    {
+        element: "[data-tour='category-slug']",
+        popover: {
+            title: "🔗 Slug (URL)",
+            description: "Se genera automáticamente del nombre. Es la parte de la URL: /categoria/electronica. Usa solo minúsculas y guiones.",
+            side: "right",
+            align: "start"
+        }
+    },
+    {
+        element: "[data-tour='category-description']",
+        popover: {
+            title: "📄 Descripción (Opcional)",
+            description: "Descripción breve de qué productos incluye esta categoría. Ayuda a los clientes a entender mejor la organización.",
+            side: "right",
+            align: "start"
+        }
+    },
+    {
+        element: "[data-tour='submit-category']",
+        popover: {
+            title: "💾 Guardar Categoría",
+            description: "Haz clic aquí para crear la categoría. Luego podrás asignar productos a esta categoría desde el formulario de productos.",
+            side: "top",
+            align: "center"
+        }
+    }
+];
+
 export const brandsTour: DriveStep[] = [
     {
         element: "#create-brand-btn",

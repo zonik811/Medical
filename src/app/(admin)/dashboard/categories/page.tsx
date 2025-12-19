@@ -9,6 +9,8 @@ import { api } from "@/services/api";
 import { useBusinessStore } from "@/lib/store/business-store";
 import { toast } from "sonner";
 import Link from "next/link";
+import { categoriesTour, startTour } from "@/lib/tours";
+import { HelpCircle } from "lucide-react";
 
 interface Category {
     $id: string;
@@ -103,12 +105,22 @@ export default function CategoriesPage() {
                         Gestiona las categorías de tus productos
                     </p>
                 </div>
-                <Link href="/dashboard/categories/create">
-                    <Button>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Nueva Categoría
+                <div className="flex gap-2">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => startTour(categoriesTour)}
+                        title="Ver guía de categorías"
+                    >
+                        <HelpCircle className="h-5 w-5" />
                     </Button>
-                </Link>
+                    <Link href="/dashboard/categories/create">
+                        <Button id="create-category-btn">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Nueva Categoría
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             {categories.length === 0 ? (
@@ -129,8 +141,8 @@ export default function CategoriesPage() {
                 </Card>
             ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {categories.map((category) => (
-                        <Card key={category.$id} className="hover:shadow-lg transition-shadow">
+                    {categories.map((category, index) => (
+                        <Card key={category.$id} className="hover:shadow-lg transition-shadow" data-tour={index === 0 ? "category-card" : undefined}>
                             <CardHeader>
                                 <CardTitle className="flex items-start justify-between">
                                     <div className="flex-1">
@@ -152,7 +164,7 @@ export default function CategoriesPage() {
                                 )}
 
                                 <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">
+                                    <span className="text-muted-foreground" data-tour={index === 0 ? "product-count" : undefined}>
                                         {productCounts[category.$id] || 0} producto{productCounts[category.$id] !== 1 ? 's' : ''}
                                     </span>
                                 </div>
@@ -185,7 +197,7 @@ export default function CategoriesPage() {
             )}
 
             {categories.length > 0 && (
-                <Card className="bg-muted/50">
+                <Card className="bg-muted/50" id="categories-info">
                     <CardContent className="pt-6">
                         <div className="flex items-start gap-3">
                             <div className="rounded-full bg-primary/10 p-2">
